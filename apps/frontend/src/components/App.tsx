@@ -5,6 +5,10 @@ import NotFound from "../pages/NotFound";
 import "../css/index.css";
 import UploadedDocuments from "../pages/UploadedDocuments";
 import Navbar from "./Navbar";
+import Conversations from "../pages/Conversations";
+import CreateConversationForm from "../pages/CreateConversationForm";
+import Settings from "../pages/Settings";
+import Account from "../pages/Account";
 
 export default function App() {
 	return (
@@ -14,6 +18,10 @@ export default function App() {
 				<Route path="/" element={<Home />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/uploaded-documents" element={<UploadedDocuments />} />
+				<Route path="/conversations" element={<Conversations />} />
+				<Route path="/new" element={<CreateConversationForm />} />
+				<Route path="/settings" element={<Settings />} />
+				<Route path="/account" element={<Account />} />
 				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>
