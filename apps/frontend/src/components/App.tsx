@@ -9,11 +9,14 @@ import Conversations from "../pages/Conversations";
 import CreateConversationForm from "../pages/CreateConversationForm";
 import Settings from "../pages/Settings";
 import Account from "../pages/Account";
+import ShowNavbar from "./middleware/ShowNavbar";
 
 export default function App() {
 	return (
 		<BrowserRouter>
-			<Navbar />
+			<ShowNavbar>
+				<Navbar />
+			</ShowNavbar>
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/about" element={<About />} />
