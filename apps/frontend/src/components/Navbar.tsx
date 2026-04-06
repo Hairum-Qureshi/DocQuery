@@ -17,6 +17,18 @@ export default function Navbar() {
 				<Link to="/conversations" className="hover:underline">
 					Conversations
 				</Link>
+				<Link to="/new" className="hover:underline">
+					New Conversation
+				</Link>
+				<Link to="/settings" className="hover:underline">
+					Settings
+				</Link>
+				<Link to="/account" className="hover:underline">
+					Profile
+				</Link>
+				<Link to="/logout" className="hover:underline">
+					Logout
+				</Link>
 			</nav>
 		</div>
 	);
