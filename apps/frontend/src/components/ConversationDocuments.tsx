@@ -8,7 +8,7 @@ export default function ConversationDocuments() {
 			<div className="flex justify-center w-full my-5 py-6 px-4">
 				<div className="w-full max-w-3xl flex flex-col gap-3">
 					<h2 className="text-2xl font-semibold text-blue-600 mb-4">
-						Documents Provided For This Conversation
+						Documents Provided In This Conversation
 					</h2>
 					<div className="flex flex-col gap-3">
 						{new Array(5).fill(0).map((_, idx) => (
