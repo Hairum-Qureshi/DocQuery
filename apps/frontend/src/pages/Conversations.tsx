@@ -9,7 +9,7 @@ export default function Conversations() {
 				<div className="flex items-center justify-center h-screen flex-col">
 					<div className="text-left space-y-4 w-3xl">
 						<h2 className="font-bold text-blue-700 text-5xl">
-							Hello, John Doe,
+							Hello John Doe,
 						</h2>
 						<h3 className="text-3xl">
 							I'm your helpful assistant,{" "}
