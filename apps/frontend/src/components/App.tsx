@@ -23,6 +23,10 @@ export default function App() {
 				<Route path="/uploaded-documents" element={<UploadedDocuments />} />
 				<Route path="/conversations" element={<Conversations />} />
 				<Route path="/conversations/c/:convoID" element={<Conversations />} />
+				<Route
+					path="/conversations/c/:convoID/documents"
+					element={<Conversations />}
+				/>
 				<Route path="/new" element={<CreateConversationForm />} />
 				<Route path="/settings" element={<Settings />} />
 				<Route path="/account" element={<Account />} />
