@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { TbLayoutSidebarRightCollapseFilled } from "react-icons/tb";
+import Conversation from "./Conversation";
 
 export default function InboxSideBar() {
 	const [expand, setExpand] = useState(false);
@@ -9,27 +10,44 @@ export default function InboxSideBar() {
 
 	return (
 		<div
-			className={`${
-				!expand
-					? "w-[5%] flex-col items-start justify-start"
-					: "w-[25%] flex-row items-start justify-start"
-			} transition-all duration-300 h-screen bg-blue-700 flex gap-4 p-4`}
+			className={`h-screen bg-blue-700 flex flex-col p-4
+    transition-all duration-500 ease-in-out
+    ${expand ? "w-[25%]" : "w-[5%]"}`}
 		>
-			<button
-				className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
-				onClick={() => navigate(-1)}
-				title="Go Back"
+			{/* Buttons */}
+			<div
+				className={`flex gap-2 mb-4 ${
+					expand ? "flex-row" : "flex-col items-center"
+				}`}
 			>
-				<FaArrowLeft />
-			</button>
+				<button
+					className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
+					onClick={() => navigate(-1)}
+					title="Go Back"
+				>
+					<FaArrowLeft />
+				</button>
+				<button
+					className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
+					onClick={() => setExpand(!expand)}
+					title="Toggle Sidebar"
+				>
+					<TbLayoutSidebarRightCollapseFilled />
+				</button>
+			</div>
 
-			<button
-				className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
-				onClick={() => setExpand(!expand)}
-				title="Toggle Sidebar"
-			>
-				<TbLayoutSidebarRightCollapseFilled />
-			</button>
+			{expand && (
+				<div className="space-y-2 h-screen overflow-y-scroll">
+					<input
+						type="text"
+						placeholder="Search..."
+						className="w-full placeholder:text-gray-200 border-2 text-white border-blue-400 px-3 py-2 rounded outline-none mb-4 bg-blue-500"
+					/>
+					{new Array(15).fill(null).map(i => (
+						<Conversation key={i} />
+					))}
+				</div>
+			)}
 		</div>
 	);
 }
