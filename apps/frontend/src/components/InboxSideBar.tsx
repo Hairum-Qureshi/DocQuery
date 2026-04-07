@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TbLayoutSidebarRightCollapseFilled } from "react-icons/tb";
 import Conversation from "./Conversation";
 
@@ -22,7 +22,7 @@ export default function InboxSideBar() {
 			>
 				<button
 					className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
-					onClick={() => navigate(-1)}
+					onClick={() => navigate("/")}
 					title="Go Back"
 				>
 					<FaArrowLeft />
@@ -37,15 +37,19 @@ export default function InboxSideBar() {
 			</div>
 
 			{expand && (
-				<div className="space-y-2 h-screen overflow-y-scroll">
+				<div className="h-screen overflow-y-scroll">
 					<input
 						type="text"
 						placeholder="Search..."
 						className="w-full placeholder:text-gray-200 border-2 text-white border-blue-400 px-3 py-2 rounded outline-none mb-4 bg-blue-500"
 					/>
-					{new Array(15).fill(null).map(i => (
-						<Conversation key={i} />
-					))}
+					<div className="space-y-4 flex flex-col">
+						{new Array(15).fill(null).map((_, index) => (
+							<Link to={`/conversations/c/${index + 1}`} key={index}>
+								<Conversation />
+							</Link>
+						))}
+					</div>
 				</div>
 			)}
 		</div>
