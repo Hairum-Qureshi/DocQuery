@@ -1,5 +1,6 @@
 import { AiFillFilePdf } from "react-icons/ai";
 import ConversationHeader from "./ConversationHeader";
+import { FaDownload } from "react-icons/fa6";
 
 export default function ConversationDocuments() {
 	return (
@@ -22,8 +23,19 @@ export default function ConversationDocuments() {
 								<p className="text-gray-800 font-medium truncate">
 									Some File.pdf
 								</p>
+								<p className="ml-auto text-gray-500">
+									<FaDownload />
+								</p>
 							</div>
 						))}
+						<div className="flex items-center gap-2 p-3 bg-white rounded-lg border border-green-200 hover:shadow-md transition-shadow cursor-pointer">
+							<div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-md">
+								<FaDownload className="text-2xl text-green-600" />
+							</div>
+							<p className="text-gray-800 font-medium truncate">
+								Download Conversation History
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
