@@ -1,28 +1,24 @@
 import ChatGreetingMessage from "./ChatGreetingMessage";
 import ResponseBubble from "./ResponseBubble";
+import ConversationHeader from "./ConversationHeader";
 
 export default function ChatInterface() {
 	return (
 		<div className="relative flex flex-col h-screen bg-gray-50">
-			{/* Header */}
-			<div className="w-full bg-white shadow-md p-4 border-b border-gray-200">
-				<h3 className="text-xl font-semibold text-blue-600">
-					Conversation Title Here
-				</h3>
-			</div>
+			<ConversationHeader />
 			<div className="flex-1 w-full flex justify-center overflow-hidden">
 				<div className="w-full max-w-3xl flex flex-col gap-4 p-4 overflow-y-auto">
 					{/* Optional Greeting */}
-					{/* <div className="flex items-center justify-center h-screen flex-col">
+					<div className="flex items-center justify-center h-screen flex-col">
 						<ChatGreetingMessage />
-					</div> */}
+					</div>
 
 					{/* Messages */}
-					<div className="flex flex-col gap-4">
+					{/* <div className="flex flex-col gap-4">
 						{new Array(20).fill(0).map((_, idx) => (
 							<ResponseBubble key={idx} />
 						))}
-					</div>
+					</div> */}
 				</div>
 			</div>
 			<div className="w-full bg-white p-4 border-t border-gray-200">
