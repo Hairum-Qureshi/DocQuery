@@ -18,6 +18,7 @@ export default function InboxSideBar() {
 			<button
 				className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
 				onClick={() => navigate(-1)}
+				title="Go Back"
 			>
 				<FaArrowLeft />
 			</button>
@@ -25,6 +26,7 @@ export default function InboxSideBar() {
 			<button
 				className="w-10 h-10 bg-blue-500 flex items-center justify-center text-white rounded hover:cursor-pointer"
 				onClick={() => setExpand(!expand)}
+				title="Toggle Sidebar"
 			>
 				<TbLayoutSidebarRightCollapseFilled />
 			</button>
