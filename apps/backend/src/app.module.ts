@@ -5,13 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-    AuthModule,
-    FirebaseModule,
-    ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URI!),
+    // AuthModule,
+    // FirebaseModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    CloudinaryModule,
+    // MongooseModule.forRoot(process.env.MONGO_URI!),
   ],
   controllers: [AppController],
   providers: [AppService],
