@@ -4,12 +4,16 @@ import { IoMdClose } from "react-icons/io";
 
 export default function UploadedPDF({
 	fileName,
+	indexToRemove,
 	reducePadding = false,
-	showRemove = false
+	showRemove = false,
+	removeFile
 }: {
 	fileName: string;
+	indexToRemove: number;
 	reducePadding?: boolean;
 	showRemove?: boolean;
+	removeFile: (indexToRemove: number) => void;
 }) {
 	return (
 		<div
@@ -24,7 +28,10 @@ export default function UploadedPDF({
 			>
 				<FaDownload />
 				{showRemove && (
-					<IoMdClose className="ml-2 text-2xl text-red-500 hover:text-red-700" />
+					<IoMdClose
+						className="ml-2 text-2xl text-red-500 hover:text-red-700"
+						onClick={() => removeFile(indexToRemove)}
+					/>
 				)}
 			</p>
 		</div>
