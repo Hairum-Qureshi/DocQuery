@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Post,
   UploadedFiles,
@@ -6,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreateConversationDTO } from 'DTOs/CreateConversation.dto';
 
 @Controller('conversation')
 export class ConversationController {
@@ -13,7 +15,10 @@ export class ConversationController {
 
   @Post('new')
   @UseInterceptors(FilesInterceptor('files')) // 'files' is the field name in the form
-  createConversation(@UploadedFiles() files: Express.Multer.File[]) {
-    this.conversationService.createConversation(files); // files is already an array
+  createConversation(
+    @Body() createConversationDTO: CreateConversationDTO,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    this.conversationService.createConversation(createConversationDTO, files); // files is already an array
   }
 }
