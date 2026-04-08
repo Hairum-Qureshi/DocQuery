@@ -1,10 +1,37 @@
 import { useState } from "react";
 import UploadedPDF from "../components/UploadedPDF";
+import { useDropzone, type FileWithPath } from "react-dropzone";
 
 // TODO - maybe have it so that the user can select existing uploaded documents as well instead of having to upload them
 
 export default function CreateConversationForm() {
+	const [uploadedDocuments, setUploadedDocuments] = useState<
+		readonly FileWithPath[]
+	>([]);
+
 	const [enabled, setEnabled] = useState(false);
+
+	const { getRootProps, getInputProps } = useDropzone({
+		maxFiles: 5,
+		accept: { "application/pdf": [] },
+		onDrop: newFiles => {
+			setUploadedDocuments(prev => {
+				const combined = [...prev, ...newFiles].filter(
+					(file: File, index: number, filesArray: FileWithPath[]) => {
+						return (
+							index ===
+							filesArray.findIndex(
+								f => f.name === file.name && f.size === file.size
+							)
+						);
+					}
+				);
+
+				// enforce maxFiles manually
+				return combined.slice(0, 5);
+			});
+		}
+	});
 
 	return (
 		<div className="min-h-screen bg-gray-50 flex justify-center px-6 py-10">
@@ -66,14 +93,22 @@ export default function CreateConversationForm() {
 						</div>
 
 						{/* RIGHT SIDE */}
-						<div className="flex-1 space-y-4">
+						<div className="flex-1 space-y-4 w-1/2">
 							{!enabled ? (
 								<>
 									<label className="text-sm font-medium text-gray-700">
 										Upload Documents
 										<span className="text-red-500">*</span>
 									</label>
-									<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:border-blue-400 transition cursor-pointer">
+									<div
+										{...getRootProps({ className: "dropzone" })}
+										className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:border-blue-400 transition cursor-pointer"
+									>
+										<input
+											{...getInputProps()}
+											className="hidden"
+											accept="application/pdf"
+										/>
 										<p className="text-gray-500">Drag & drop files here</p>
 										<p className="text-sm text-gray-400 mt-1">
 											or click to browse
@@ -96,11 +131,20 @@ export default function CreateConversationForm() {
 										</div>
 
 										<div className="flex flex-col gap-2 max-h-56 overflow-y-auto pr-1">
-											<UploadedPDF reducePadding showRemove />
-											<UploadedPDF reducePadding showRemove />
-											<UploadedPDF reducePadding showRemove />
-											<UploadedPDF reducePadding showRemove />
-											<UploadedPDF reducePadding showRemove />
+											{uploadedDocuments.length > 0 ? (
+												uploadedDocuments.map((file, index) => (
+													<UploadedPDF
+														key={index}
+														fileName={file.name}
+														reducePadding
+														showRemove
+													/>
+												))
+											) : (
+												<p className="text-sm text-gray-500">
+													No files uploaded yet.
+												</p>
+											)}
 										</div>
 									</div>
 								</>
@@ -116,8 +160,9 @@ export default function CreateConversationForm() {
 									/>
 									<p className="text-xs text-gray-500 mt-1">
 										These documents will be used as context in the conversation
-										and must be documents you or your team have uploaded. You can find the URLs of your
-										uploaded documents in your profile under "My Documents".
+										and must be documents you or your team have uploaded. You
+										can find the URLs of your uploaded documents in your profile
+										under "My Documents".
 									</p>
 								</div>
 							)}
