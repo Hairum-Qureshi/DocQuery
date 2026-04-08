@@ -5,7 +5,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
@@ -20,12 +19,12 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useStaticAssets(join(__dirname, '..', 'assets'), {
-    prefix: '/assets/',
-  });
+  const PORT = process.env.PORT ?? 3000;
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(PORT);
 
-  console.log('Nest.js Server successfully started');
+  app.setGlobalPrefix('api');
+
+  console.log(`Nest.js Server successfully started on port ${PORT}!`);
 }
 bootstrap();
