@@ -33,6 +33,12 @@ export default function CreateConversationForm() {
 		}
 	});
 
+	function removeFile(indexToRemove: number) {
+		setUploadedDocuments(prev =>
+			prev.filter((_, index) => index !== indexToRemove)
+		);
+	}
+
 	return (
 		<div className="min-h-screen bg-gray-50 flex justify-center px-6 py-10">
 			<div className="w-full max-w-5xl rounded-xl p-3">
@@ -140,8 +146,10 @@ export default function CreateConversationForm() {
 													<UploadedPDF
 														key={index}
 														fileName={file.name}
+														indexToRemove={index}
 														reducePadding
 														showRemove
+														removeFile={removeFile}
 													/>
 												))
 											) : (
