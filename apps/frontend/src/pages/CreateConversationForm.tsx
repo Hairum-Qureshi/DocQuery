@@ -120,7 +120,11 @@ export default function CreateConversationForm() {
 									<div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
 										<div className="flex items-center justify-between mb-2">
 											<p className="text-sm font-medium text-gray-700">
-												Uploaded Files (5)
+												Uploaded Files (
+												<span className="font-semibold text-blue-600">
+													{uploadedDocuments.length}
+												</span>
+												/5)
 											</p>
 											<button
 												type="button"
