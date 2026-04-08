@@ -41,7 +41,7 @@ export default function AccessTable() {
 									<p>Alex Joe</p>
 								</div>
 							</td>
-							<td className="p-4">READ, WRITE, DELETE</td>
+							<td className="p-4">READ, WRITE, DELETE, DOWNLOAD</td>
 							<td className="p-4 flex flex-col cursor-pointer font-semibold">
 								<p className="text-red-600 hover:underline">Revoke Access</p>
 								<p className="text-green-600 hover:underline">
@@ -98,7 +98,7 @@ export default function AccessTable() {
 									<p>Jane Doe</p>
 								</div>
 							</td>
-							<td className="p-4">READ, WRITE, UPDATE, DELETE</td>
+							<td className="p-4">READ, WRITE, DOWNLOAD, UPDATE, DELETE</td>
 							<td className="p-4 flex flex-col cursor-pointer font-semibold">
 								<p className="text-red-600 hover:underline">Revoke Access</p>
 								<p className="text-green-600 hover:underline">
