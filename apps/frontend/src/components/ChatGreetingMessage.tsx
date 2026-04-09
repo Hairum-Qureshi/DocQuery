@@ -1,11 +1,15 @@
 import { Link, useParams } from "react-router-dom";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 export default function ChatGreetingMessage() {
 	const { convoID } = useParams();
+	const { data: currUserData } = useCurrentUser();
 
 	return (
 		<div className="text-left space-y-4 w-3xl">
-			<h2 className="font-bold text-blue-700 text-5xl">Hello John Doe,</h2>
+			<h2 className="font-bold text-blue-700 text-5xl">
+				Hello {currUserData?.firstName} {currUserData?.lastName},
+			</h2>
 			<h3 className="text-3xl">
 				I'm your helpful assistant, <span className="text-sky-600">Docent</span>
 			</h3>
