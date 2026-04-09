@@ -6,10 +6,11 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 export class ConversationService {
   constructor(private readonly cloudinaryService: CloudinaryService) {}
 
-  createConversation(
+  createConversationWithFileUploads(
     createConversationDTO: CreateConversationDTO,
+    currUserID: string,
     files: Express.Multer.File[],
   ) {
-    return this.cloudinaryService.uploadPDFs(files);
+    return this.cloudinaryService.uploadPDFs(files, currUserID);
   }
 }
