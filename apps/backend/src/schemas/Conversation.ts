@@ -13,7 +13,7 @@ export class Conversation {
   documentReferences: string[];
 
   @Prop({ type: [String], default: [], ref: 'User' })
-  participantIDs: string[];
+  participantEmails: string[];
 
   @Prop({ default: Date.now })
   createdAt: Date;
