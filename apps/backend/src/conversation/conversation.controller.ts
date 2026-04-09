@@ -25,7 +25,7 @@ export class ConversationController {
     @CurrentUser() currUser: types.UserPayload,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.conversationService.createConversation(
+    return this.conversationService.createConversationWithFileUploads(
       createConversationDTO,
       currUser._id,
       files,
