@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v2 as Cloudinary } from 'cloudinary';
-import { encode } from 'punycode';
 
 @Injectable()
 export class CloudinaryService {
@@ -14,7 +13,6 @@ export class CloudinaryService {
     conversationID: string,
   ) {
     for (const file of files) {
-      // sanitize so it's URL friendly
       const DOCUMENT_NAME =
         `${currUserID}_${file.originalname.split('.')[0]}`.replace(/\s+/g, '-');
       const FOLDER_NAME = `user-${currUserID}_PDF_Uploads/conversation-${conversationID}`;
