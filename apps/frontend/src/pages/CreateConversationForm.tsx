@@ -151,6 +151,7 @@ export default function CreateConversationForm() {
 											<button
 												type="button"
 												className="text-xs text-red-500 hover:underline"
+												onClick={() => setUploadedDocuments([])}
 											>
 												Clear all
 											</button>
