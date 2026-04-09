@@ -15,7 +15,7 @@ export class CloudinaryService {
     for (const file of files) {
       const DOCUMENT_NAME =
         `${currUserID}_${file.originalname.split('.')[0]}`.replace(/\s+/g, '-');
-      const FOLDER_NAME = `${currUserID}_PDF_Uploads/${conversationID}`;
+      const FOLDER_NAME = `user-${currUserID}_PDF_Uploads/conversation-${conversationID}`;
 
       new Promise((resolve) => {
         Cloudinary.uploader
