@@ -7,37 +7,33 @@ export class CloudinaryService {
     @Inject('Cloudinary') private readonly cloudinary: typeof Cloudinary,
   ) {}
 
-  uploadPDFs(
+  async uploadPDFs(
     files: Express.Multer.File[],
     currUserID: string,
     conversationID: string,
-  ) {
+  ): Promise<string[]> {
+    const URLs: string[] = [];
+
     for (const file of files) {
       const DOCUMENT_NAME =
         `${currUserID}_${file.originalname.split('.')[0]}`.replace(/\s+/g, '-');
       const FOLDER_NAME = `user-${currUserID}_PDF_Uploads/conversation-${conversationID}`;
 
-      new Promise((resolve) => {
+      const uploadResult: any = await new Promise((resolve) => {
         Cloudinary.uploader
           .upload_stream(
             { public_id: DOCUMENT_NAME, folder: FOLDER_NAME },
-            (error, uploadResult) => {
-              if (error) {
-                return error;
-              }
-
-              return resolve(uploadResult);
+            (error, result) => {
+              if (error) return error;
+              resolve(result);
             },
           )
           .end(file.buffer);
-      })
-        .then((uploadResult: any) => {
-          console.log(uploadResult.secure_url);
-          return uploadResult.secure_url;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      });
+
+      URLs.push(uploadResult.secure_url as string);
     }
+
+    return URLs;
   }
 }
