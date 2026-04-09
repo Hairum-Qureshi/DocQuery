@@ -1,6 +1,7 @@
 import { useState } from "react";
 import UploadedPDF from "../components/UploadedPDF";
 import { useDropzone, type FileWithPath } from "react-dropzone";
+import useForm from "../hooks/useForm";
 
 // TODO - maybe have it so that the user can select existing uploaded documents as well instead of having to upload them
 
@@ -8,8 +9,11 @@ export default function CreateConversationForm() {
 	const [uploadedDocuments, setUploadedDocuments] = useState<
 		readonly FileWithPath[]
 	>([]);
+	const [title, setTitle] = useState("");
+	const [participants, setParticipants] = useState("");
 
 	const [enabled, setEnabled] = useState(false);
+	const { createConversationWithFiles } = useForm();
 
 	const { getRootProps, getInputProps } = useDropzone({
 		maxFiles: 5,
@@ -52,6 +56,11 @@ export default function CreateConversationForm() {
 						className={`relative inline-flex hover:cursor-pointer h-6 w-11 items-center rounded-full transition-colors ${
 							enabled ? "bg-blue-600" : "bg-gray-300"
 						}`}
+						title={
+							enabled
+								? "Switch to file upload mode"
+								: "Switch to URL input mode"
+						}
 					>
 						<span
 							className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -79,6 +88,8 @@ export default function CreateConversationForm() {
 									type="text"
 									placeholder="e.g. Project Alpha Discussion"
 									className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+									value={title}
+									onChange={e => setTitle(e.target.value)}
 								/>
 							</div>
 
@@ -90,6 +101,8 @@ export default function CreateConversationForm() {
 								<textarea
 									placeholder="Enter emails separated by commas"
 									className="border border-gray-300 rounded-lg px-4 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+									value={participants}
+									onChange={e => setParticipants(e.target.value)}
 								/>
 								<p className="text-xs text-gray-500">
 									Must be registered users. They can view, but not send
@@ -122,6 +135,9 @@ export default function CreateConversationForm() {
 									</div>
 									<p className="text-xs text-gray-500">
 										These documents will be used as context in the conversation.
+										Please ensure your documents are not scanned or image-based
+										PDFs, as they may not be processed correctly. You can upload
+										up to 5 PDFs.
 									</p>
 									<div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
 										<div className="flex items-center justify-between mb-2">
@@ -186,6 +202,15 @@ export default function CreateConversationForm() {
 						<button
 							type="submit"
 							className="w-full md:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 active:scale-[0.98] transition"
+							title="Create Conversation Button"
+							onClick={e => {
+								e.preventDefault();
+								createConversationWithFiles(
+									title,
+									participants,
+									uploadedDocuments
+								);
+							}}
 						>
 							Create Conversation
 						</button>
