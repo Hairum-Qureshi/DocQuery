@@ -15,7 +15,7 @@ import { BearerToken } from 'src/decorators/bearerToken.decorator';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import * as types from 'src/types';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
