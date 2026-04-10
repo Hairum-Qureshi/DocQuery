@@ -8,7 +8,6 @@ from google import genai
 from pinecone import Pinecone, ServerlessSpec
 import os
 import uuid
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,17 +15,20 @@ load_dotenv()
 model = SentenceTransformer("all-MiniLM-L6-v2")
 client = genai.Client()
 
+PC_INDEX_NAME = "doc-query"
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-pc.create_index(
-    name="doc-query",
-    dimension=384,
-    metric="cosine",
-    spec=ServerlessSpec(
-        cloud="aws",
-        region="us-east-1"
+if not pc.has_index(PC_INDEX_NAME):
+    pc.create_index(
+        name=PC_INDEX_NAME,
+        dimension=384,
+        metric="cosine",
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
     )
-)
-PINECONE_INDEX = pc.Index("doc-query")
+PINECONE_INDEX = pc.Index(PC_INDEX_NAME)
+print("Pinecone index is ready to use.")
 
 app = FastAPI()
 
@@ -36,6 +38,18 @@ app = FastAPI()
 @app.get('/')
 def root():
     return {"message": "Server is up and running!"}
+
+def find_similiar(user_id:str, conversation_id:str):
+    print('Finding similar chunks in Pinecone for user_id:', user_id)
+    test_question = "What stage is AI currently in?"
+    query_vector = model.encode(test_question).tolist()
+    res = PINECONE_INDEX.query(
+        namespace=f"{user_id}:{conversation_id}",
+        vector=query_vector, 
+        top_k=3,
+        include_metadata=True,
+        include_values=False,
+    )
 
 def chunk_text(text:str, chunk_size:int, overlap:int) -> list[str]:
     chunks: list[str] = []
@@ -49,7 +63,7 @@ def chunk_text(text:str, chunk_size:int, overlap:int) -> list[str]:
     
     return chunks
 
-def get_pdf_content(url:str, conversation_id:str, user_id:str, curr_pdf_num:int) -> None: 
+def process_pdf_content(url:str, conversation_id:str, user_id:str, curr_pdf_num:int, file_name:str) -> None: 
     response = requests.get(url)
     response.raise_for_status()
     text = ""
@@ -58,26 +72,30 @@ def get_pdf_content(url:str, conversation_id:str, user_id:str, curr_pdf_num:int)
            text += page.extract_text() or ""
 
     chunks = chunk_text(text, chunk_size=1000, overlap=200)
-    embeddings = model.encode(chunks)
-    try:
+    embeddings = model.encode(chunks).tolist()
+    try:            
+        vectors = []
         for index, embed in enumerate(embeddings):
-            PINECONE_INDEX.upsert(
-            vectors=[
-                {
-                    "id": f"pdf{curr_pdf_num}_c{conversation_id}_{uuid.uuid4().hex[:8]}",
-                    "values": embed,
-                    "metadata": {
-                        "chunk_text": chunks[index],
-                        "conversation_id": conversation_id,
-                        "user_id": user_id,
-                        "chunk_idx": index,
-                        "pdf_num": curr_pdf_num
-                    }
-                },
-            ],
-            namespace=user_id
+            vectors.append({
+                "id": f"pdf{curr_pdf_num}_c{conversation_id}_{uuid.uuid4().hex[:8]}",
+                "values": embed,
+                "metadata": {
+                    "chunk_text": chunks[index],
+                    "conversation_id": conversation_id,
+                    "user_id": user_id,
+                    "chunk_idx": index,
+                    "pdf_num": curr_pdf_num,
+                    "file_name": file_name
+                }
+            })
+
+        PINECONE_INDEX.upsert(
+            vectors=vectors,
+            namespace=f"{user_id}:{conversation_id}"
         )
-        print("Successfully upserted chunk index", index, "to Pinecone.")
+
+        print(f"Upserted {len(vectors)} chunks successfully")
+        find_similiar(user_id, conversation_id)
     except Exception as e:
         print("There was a problem upserting to Pinecone:", e)
     # test = "What stage is AI currently in?"
@@ -100,14 +118,17 @@ class ProcessPDFRequest(BaseModel):
     urls: List[str]
     conversationID: str
     userID: str
+    file_names: List[str]
 
 @app.post('/process-pdfs')
 def process_pdfs(payload: ProcessPDFRequest):
     PDFs = payload.urls
     curr_pdf_num = 1
-    for url in PDFs:
+    print(PDFs, payload.file_names)
+    print('Processing...')
+    for index, url in enumerate(PDFs):
         if requests.get(url).status_code == 200:
-            text_content = get_pdf_content(url, payload.conversationID, payload.userID, curr_pdf_num)
+            process_pdf_content(url, payload.conversationID, payload.userID, curr_pdf_num, payload.file_names[index])
             curr_pdf_num += 1
         else:
             print(f"Failed to access PDF at URL: {url}")
