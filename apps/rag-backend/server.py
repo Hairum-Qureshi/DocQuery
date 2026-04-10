@@ -73,8 +73,9 @@ def get_pdf_content(url:str, conversation_id:str, user_id:str, curr_pdf_num:int)
                         "chunk_idx": index,
                         "pdf_num": curr_pdf_num
                     }
-                }
-            ]
+                },
+            ],
+            namespace=user_id
         )
         print("Successfully upserted chunk index", index, "to Pinecone.")
     except Exception as e:
@@ -103,7 +104,6 @@ class ProcessPDFRequest(BaseModel):
 @app.post('/process-pdfs')
 def process_pdfs(payload: ProcessPDFRequest):
     PDFs = payload.urls
-    num_pdfs = len(PDFs)
     curr_pdf_num = 1
     for url in PDFs:
         if requests.get(url).status_code == 200:
