@@ -16,10 +16,18 @@ export class ConversationService {
     private readonly configService: ConfigService,
   ) {}
 
-  private async sendURLsToPython(uploadedPDF_URLs: string[]) {
+  private async sendURLsToPython(
+    uploadedPDF_URLs: string[],
+    conversationID: string,
+    userID: string,
+  ) {
     await axios.post(
       `${this.configService.get<string>('PYTHON_BACKEND')}/process-pdfs`,
-      uploadedPDF_URLs,
+      {
+        urls: uploadedPDF_URLs,
+        conversationID,
+        userID,
+      },
     );
   }
 
@@ -68,7 +76,11 @@ export class ConversationService {
       },
     );
 
-    await this.sendURLsToPython(uploadedPDF_URLs);
+    await this.sendURLsToPython(
+      uploadedPDF_URLs,
+      conversation._id.toString(),
+      currUserID,
+    );
 
     return conversation;
   }
