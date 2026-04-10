@@ -6,3 +6,4 @@ pydantic
 sentence-transformers
 google-genai
 python-dotenv
+pinecone
