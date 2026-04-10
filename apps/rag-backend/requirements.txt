@@ -3,3 +3,5 @@ uvicorn
 requests
 pdfplumber
 pydantic
+sentence-transformers
+google-genai
