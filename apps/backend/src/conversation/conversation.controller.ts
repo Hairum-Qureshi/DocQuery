@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UploadedFiles,
   UseGuards,
@@ -30,5 +31,11 @@ export class ConversationController {
       currUser._id,
       files,
     );
+  }
+
+  @Get('all')
+  @UseGuards(AuthGuard())
+  getAllConversationsForUser(@CurrentUser() currUser: types.UserPayload) {
+    return this.conversationService.getAllConversationsForUser(currUser._id);
   }
 }
