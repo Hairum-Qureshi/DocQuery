@@ -7,5 +7,3 @@ sentence-transformers
 google-genai
 python-dotenv
 pinecone
-jwt
-PyJWT
