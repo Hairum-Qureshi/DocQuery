@@ -6,6 +6,7 @@ import mongoose, { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Conversation, ConversationDocument } from 'src/schemas/Conversation';
 import { ConfigService } from '@nestjs/config';
+import { Message, MessageDocument } from 'src/schemas/Message';
 
 @Injectable()
 export class ConversationService {
@@ -13,6 +14,8 @@ export class ConversationService {
     private readonly cloudinaryService: CloudinaryService,
     @InjectModel(Conversation.name)
     private readonly conversationModel: Model<ConversationDocument>,
+    @InjectModel(Message.name)
+    private readonly messageModel: Model<MessageDocument>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -20,6 +23,7 @@ export class ConversationService {
     uploadedPDF_URLs: string[],
     conversationID: string,
     userID: string,
+    fileNames: string[],
   ) {
     await axios.post(
       `${this.configService.get<string>('PYTHON_BACKEND')}/process-pdfs`,
@@ -27,6 +31,7 @@ export class ConversationService {
         urls: uploadedPDF_URLs,
         conversationID,
         userID,
+        fileNames,
       },
     );
   }
@@ -34,7 +39,10 @@ export class ConversationService {
   private async createConversationMongoDocument(
     currUserID: string,
     title: string,
-    documentReferences: string[],
+    documentReferences: {
+      fileName: string;
+      url: string;
+    }[],
     participantEmails: string[] = [],
   ) {
     const newConversation = new this.conversationModel({
@@ -53,6 +61,9 @@ export class ConversationService {
     files: Express.Multer.File[],
   ) {
     const { conversationTitle, participants } = createConversationDTO;
+    const fileNames = files.map(
+      (file: Express.Multer.File) => file.originalname,
+    );
 
     const conversation = await this.createConversationMongoDocument(
       currUserID,
@@ -72,7 +83,10 @@ export class ConversationService {
     await this.conversationModel.findByIdAndUpdate(
       { _id: new mongoose.Types.ObjectId(conversation._id) },
       {
-        documentReferences: uploadedPDF_URLs,
+        documentReferences: uploadedPDF_URLs.map((url, index) => ({
+          fileName: fileNames[index],
+          url,
+        })),
       },
     );
 
@@ -80,8 +94,13 @@ export class ConversationService {
       uploadedPDF_URLs,
       conversation._id.toString(),
       currUserID,
+      fileNames,
     );
 
     return conversation;
+  }
+
+  async getAllConversationsForUser(currUserID: string) {
+    return await this.conversationModel.find({ userID: currUserID }).lean();
   }
 }
