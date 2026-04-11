@@ -26,4 +26,4 @@ SchemaFactory.createForClass(Conversation);
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
 export type ConversationDocument = HydratedDocument<Conversation>;
 
-ConversationSchema.index({ userID: 1 });
+ConversationSchema.index({ userID: 1, createdAt: 1 });
