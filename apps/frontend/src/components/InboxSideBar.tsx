@@ -3,10 +3,13 @@ import { FaArrowLeft } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { TbLayoutSidebarRightCollapseFilled } from "react-icons/tb";
 import Conversation from "./Conversation";
+import useConversation from "../hooks/useConversation";
+import type { Conversation as ConversationInterface } from "../interfaces";
 
 export default function InboxSideBar() {
 	const [expand, setExpand] = useState(false);
 	const navigate = useNavigate();
+	const { conversationsList } = useConversation();
 
 	return (
 		<div
@@ -44,11 +47,15 @@ export default function InboxSideBar() {
 						className="w-full placeholder:text-gray-200 border-2 text-white border-blue-400 px-3 py-2 rounded outline-none mb-4 bg-blue-500"
 					/>
 					<div className="space-y-4 flex flex-col">
-						{new Array(15).fill(null).map((_, index) => (
-							<Link to={`/conversations/c/${index + 1}`} key={index}>
-								<Conversation />
-							</Link>
-						))}
+						{conversationsList?.length &&
+							conversationsList?.map((conversation: ConversationInterface) => (
+								<Link
+									to={`/conversations/c/${conversation._id}`}
+									key={conversation._id}
+								>
+									<Conversation title={conversation.title} />
+								</Link>
+							))}
 					</div>
 				</div>
 			)}
