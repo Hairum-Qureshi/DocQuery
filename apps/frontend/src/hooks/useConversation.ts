@@ -8,7 +8,7 @@ interface UseConversationHook {
 
 export default function useConversation(): UseConversationHook {
 	const { data: conversationsList } = useQuery({
-		queryKey: ["conversations-list"], // <-- this is important for referencing if you want to refetch certain data
+		queryKey: ["conversations-list"],
 		queryFn: async () => {
 			try {
 				const response = await axios.get(
