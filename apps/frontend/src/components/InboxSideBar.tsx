@@ -46,7 +46,7 @@ export default function InboxSideBar() {
 						placeholder="Search..."
 						className="w-full placeholder:text-gray-200 border-2 text-white border-blue-400 px-3 py-2 rounded outline-none mb-4 bg-blue-500"
 					/>
-					<div className="space-y-4 flex flex-col">
+					<div className="flex flex-col">
 						{conversationsList?.length ? (
 							conversationsList?.map((conversation: ConversationInterface) => (
 								<Link
