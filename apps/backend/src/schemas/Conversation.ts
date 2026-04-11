@@ -9,8 +9,20 @@ export class Conversation {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ type: [String], default: [], required: true })
-  documentReferences: string[];
+  @Prop({
+    type: [
+      {
+        file_name: String,
+        url: String,
+      },
+    ],
+    default: [],
+    required: true,
+  })
+  documentReferences: {
+    file_name: string;
+    url: string;
+  }[];
 
   @Prop({ type: [String], default: [], ref: 'User' })
   participantEmails: string[];
