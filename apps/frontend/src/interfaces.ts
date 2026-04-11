@@ -3,4 +3,19 @@ interface UseGoogleAuthHook {
 	signOut: () => Promise<void>;
 }
 
-export type { UseGoogleAuthHook };
+interface DocumentReference {
+	fileName: string;
+	url: string;
+}
+
+interface Conversation {
+	_id: string;
+	userID: string;
+	title: string;
+	documentReferences: DocumentReference[];
+	participantEmails: string[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+export type { UseGoogleAuthHook, Conversation };
