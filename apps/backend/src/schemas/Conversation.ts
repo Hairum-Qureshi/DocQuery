@@ -20,7 +20,7 @@ export class Conversation {
     required: true,
   })
   documentReferences: {
-    file_name: string;
+    fileName: string;
     url: string;
   }[];
 
