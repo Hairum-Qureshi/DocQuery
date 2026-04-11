@@ -5,6 +5,7 @@ import { ConversationService } from './conversation.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Conversation, ConversationSchema } from 'src/schemas/Conversation';
+import { Message, MessageSchema } from 'src/schemas/Message';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { Conversation, ConversationSchema } from 'src/schemas/Conversation';
     CloudinaryModule,
     MongooseModule.forFeature([
       { name: Conversation.name, schema: ConversationSchema },
+      { name: Message.name, schema: MessageSchema },
     ]),
   ],
   providers: [ConversationService],
