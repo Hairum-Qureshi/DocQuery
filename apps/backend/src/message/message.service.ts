@@ -6,6 +6,7 @@ import { Conversation, ConversationDocument } from 'src/schemas/Conversation';
 import { Message } from 'src/schemas/Message';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import sanitizeHtml from 'sanitize-html';
 
 @Injectable()
 export class MessageService {
@@ -39,7 +40,7 @@ export class MessageService {
     return await this.messageModel.create({
       conversationID,
       senderID: '0000000000000001',
-      content: response.data.answer,
+      content: sanitizeHtml(response.data.answer),
     });
   }
 
