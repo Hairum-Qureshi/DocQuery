@@ -1,11 +1,3 @@
-// export default function Conversation() {
-// 	return (
-// 		<div className="px-3 py-2 text-white text-sm hover:cursor-pointer hover:bg-sky-500 active:bg-sky-600 bg-blue-500 rounded-sm">
-// 			Conversation Topic 1
-// 		</div>
-// 	);
-// }
-
 export default function Conversation({
 	title,
 	active = false
