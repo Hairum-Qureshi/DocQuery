@@ -1,16 +1,18 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa";
+import useConversation from "../hooks/useConversation";
 
 export default function ConversationHeader() {
 	const { convoID } = useParams();
 	const location = useLocation();
 	const locationIncludesDocuments = location.pathname.includes("/documents");
+	const { conversationData } = useConversation();
 
 	return (
 		<div className="w-full bg-white shadow-md p-4 border-b border-gray-200 flex items-center">
 			<h3 className="text-xl font-semibold text-blue-600">
-				Conversation Title Here
+				{conversationData?.title || "Untitled Conversation"}
 			</h3>
 			{!locationIncludesDocuments ? (
 				<Link to={`/conversations/c/${convoID}/documents`} className="ml-auto">
