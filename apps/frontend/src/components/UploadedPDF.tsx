@@ -62,7 +62,7 @@ export default function UploadedPDF({
 						onClick={() =>
 							removeFile && indexToRemove && removeFile(indexToRemove)
 						}
-						className="text-red-500 hover:text-red-700"
+						className="text-red-500 hover:text-red-700 hover:cursor-pointer"
 						title="Remove document button"
 					>
 						<IoMdClose className="text-2xl" />
@@ -74,7 +74,7 @@ export default function UploadedPDF({
 						<button
 							type="button"
 							onClick={() => documentURL && downloadDocument(documentURL)}
-							className="hover:text-gray-700"
+							className="hover:text-gray-700 hover:cursor-pointer"
 							title="Download button"
 						>
 							<FaDownload />
@@ -84,7 +84,7 @@ export default function UploadedPDF({
 							onClick={() =>
 								window.open(documentURL, "_blank", "noopener,noreferrer")
 							}
-							className="hover:text-gray-700"
+							className="hover:text-gray-700 hover:cursor-pointer"
 							title="Open PDF in new tab button"
 						>
 							<FaExternalLinkAlt />
