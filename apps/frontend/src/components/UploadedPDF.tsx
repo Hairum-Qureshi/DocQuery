@@ -14,10 +14,10 @@ export default function UploadedPDF({
 }: {
 	documentName: string;
 	documentURL: string;
-	indexToRemove: number;
+	indexToRemove?: number;
 	reducePadding?: boolean;
 	showRemove?: boolean;
-	removeFile: (indexToRemove: number) => void;
+	removeFile?: (indexToRemove: number) => void;
 }) {
 	async function downloadDocument(documentURL: string) {
 		const response = await axios.get(documentURL, {
@@ -55,32 +55,42 @@ export default function UploadedPDF({
 				<AiFillFilePdf className="text-2xl text-blue-600" />
 			</div>
 			<p className="text-gray-800 font-medium truncate">{documentName}</p>
-			<div className="ml-auto flex items-center space-x-4">
-				<span
-					className={`${showRemove ? "ml-auto text-gray-500 flex items-center" : "ml-auto text-gray-500 flex"}
-					`}
-				>
-					<span
-						className="flex items-center"
-						onClick={() => downloadDocument(documentURL)}
+			<div className="ml-auto flex items-center space-x-4 text-gray-500">
+				{showRemove && (
+					<button
+						type="button"
+						onClick={() =>
+							removeFile && indexToRemove && removeFile(indexToRemove)
+						}
+						className="text-red-500 hover:text-red-700"
+						title="Remove document button"
 					>
-						<FaDownload />
-						{showRemove && (
-							<IoMdClose
-								className="ml-2 text-2xl text-red-500 hover:text-red-700"
-								onClick={() => removeFile(indexToRemove)}
-							/>
-						)}
-					</span>
-				</span>
-				<span
-					className={`${showRemove ? "ml-2 text-gray-500 flex items-center" : "ml-auto text-gray-500 flex"}`}
-					onClick={() =>
-						window.open(documentURL, "_blank", "noopener,noreferrer")
-					}
-				>
-					<FaExternalLinkAlt />
-				</span>
+						<IoMdClose className="text-2xl" />
+					</button>
+				)}
+
+				{!showRemove && (
+					<>
+						<button
+							type="button"
+							onClick={() => downloadDocument(documentURL)}
+							className="hover:text-gray-700"
+							title="Download button"
+						>
+							<FaDownload />
+						</button>
+						<button
+							type="button"
+							onClick={() =>
+								window.open(documentURL, "_blank", "noopener,noreferrer")
+							}
+							className="hover:text-gray-700"
+							title="Open PDF in new tab button"
+						>
+							<FaExternalLinkAlt />
+						</button>
+					</>
+				)}
 			</div>
 		</div>
 	);
