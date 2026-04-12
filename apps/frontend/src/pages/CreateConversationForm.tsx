@@ -162,7 +162,7 @@ export default function CreateConversationForm() {
 												uploadedDocuments.map((file, index) => (
 													<UploadedPDF
 														key={index}
-														fileName={file.name}
+														documentName={file.name}
 														indexToRemove={index}
 														reducePadding
 														showRemove
