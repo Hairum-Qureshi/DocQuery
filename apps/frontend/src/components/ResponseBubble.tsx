@@ -5,11 +5,16 @@ export default function ResponseBubble({
 	message: string;
 	you: boolean;
 }) {
-	return (
+	return you ? (
 		<div
-			className={`p-2 rounded-md ${you ? "bg-blue-500 text-white w-1/2 ml-auto" : "bg-gray-200 w-1/2 mr-auto"}`}
+			className={`self-end bg-blue-600 text-white px-4 py-2 rounded-lg max-w-[80%] whitespace-pre-wrap wrap-break-word`}
 		>
 			{message}
 		</div>
+	) : (
+		<div
+			className={`self-start bg-gray-200 text-gray-800 px-4 py-2 rounded-lg max-w-[80%] whitespace-pre-wrap wrap-break-word`}
+			dangerouslySetInnerHTML={{ __html: message }}
+		/>
 	);
 }
