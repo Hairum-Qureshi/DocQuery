@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UploadedFiles,
   UseGuards,
@@ -37,5 +38,11 @@ export class ConversationController {
   @UseGuards(AuthGuard())
   getAllConversationsForUser(@CurrentUser() currUser: types.UserPayload) {
     return this.conversationService.getAllConversationsForUser(currUser._id);
+  }
+
+  @Get(':conversationID')
+  @UseGuards(AuthGuard())
+  getConversationByID(@Param('conversationID') conversationID: string) {
+    return this.conversationService.getConversationByID(conversationID);
   }
 }
