@@ -7,7 +7,7 @@ export default function ResponseBubble({
 }) {
 	return (
 		<div
-			className={`p-2 rounded-md ${you ? "bg-blue-400 text-white w-1/2 ml-auto" : "bg-gray-200 w-1/2 mr-auto"}`}
+			className={`p-2 rounded-md ${you ? "bg-blue-500 text-white w-1/2 ml-auto" : "bg-gray-200 w-1/2 mr-auto"}`}
 		>
 			{message}
 		</div>
