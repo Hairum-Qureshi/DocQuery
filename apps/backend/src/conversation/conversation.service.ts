@@ -25,15 +25,23 @@ export class ConversationService {
     userID: string,
     fileNames: string[],
   ) {
-    await axios.post(
-      `${this.configService.get<string>('PYTHON_BACKEND')}/process-pdfs`,
-      {
-        urls: uploadedPDF_URLs,
-        conversationID,
-        userID,
-        fileNames,
-      },
-    );
+    try {
+      await axios.post(
+        `${this.configService.get<string>('PYTHON_BACKEND')}/process-pdfs`,
+        {
+          urls: uploadedPDF_URLs,
+          conversationID,
+          userID,
+          fileNames,
+        },
+      );
+    } catch (error) {
+      console.error('Error sending URLs to Python backend:', error);
+      return {
+        success: false,
+        message: 'Failed to send URLs to Python backend',
+      };
+    }
   }
 
   private async createConversationMongoDocument(
@@ -61,7 +69,7 @@ export class ConversationService {
     files: Express.Multer.File[],
   ) {
     const { conversationTitle, participants } = createConversationDTO;
-    const fileNames = files.map(
+    const fileNames: string[] = files.map(
       (file: Express.Multer.File) => file.originalname,
     );
 
@@ -102,5 +110,19 @@ export class ConversationService {
 
   async getAllConversationsForUser(currUserID: string) {
     return await this.conversationModel.find({ userID: currUserID }).lean();
+  }
+
+  async getConversationByID(conversationID: string) {
+    const conversation = await this.conversationModel
+      .findOne({
+        _id: conversationID,
+      })
+      .lean();
+
+    if (!conversation) {
+      throw new Error('Conversation not found or access denied');
+    }
+
+    return conversation;
   }
 }
