@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Cookie, HTTPException
 import requests, pdfplumber
 from io import BytesIO 
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ from pinecone import Pinecone, ServerlessSpec
 import os
 import uuid
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -39,17 +40,25 @@ app = FastAPI()
 def root():
     return {"message": "Server is up and running!"}
 
-def find_similiar(user_id:str, conversation_id:str):
-    print('Finding similar chunks in Pinecone for user_id:', user_id)
-    test_question = "What stage is AI currently in?"
-    query_vector = model.encode(test_question).tolist()
+def find_similar(user_id:str, conversation_id:str, query:str):
+    query_vector = model.encode(query).tolist()
     res = PINECONE_INDEX.query(
         namespace=f"{user_id}:{conversation_id}",
         vector=query_vector, 
-        top_k=3,
+        top_k=1,
         include_metadata=True,
         include_values=False,
     )
+
+    # THRESHOLD = 0.7
+
+    # matches = []
+    # for match in res.matches:
+    #     if match.score >= THRESHOLD:
+    #         matches.append(match)
+
+    # return matches
+    return res
 
 def chunk_text(text:str, chunk_size:int, overlap:int) -> list[str]:
     chunks: list[str] = []
@@ -93,54 +102,155 @@ def process_pdf_content(url:str, conversation_id:str, user_id:str, curr_pdf_num:
             vectors=vectors,
             namespace=f"{user_id}:{conversation_id}"
         )
-
-        print(f"Upserted {len(vectors)} chunks successfully")
-        find_similiar(user_id, conversation_id)
+        print(f"Successfully upserted {len(vectors)} chunks from PDF {curr_pdf_num} into Pinecone.")
     except Exception as e:
         print("There was a problem upserting to Pinecone:", e)
-    # test = "What stage is AI currently in?"
-    # test_embed = model.encode(test)
-
-    # similarities = model.similarity(test_embed, embeddings)
-    # best_idx = similarities.argmax()
-
-    # try:
-    #     response = client.models.generate_content(
-    #         model="gemini-3-flash-preview", contents=f"here is the user's question: {test} and here is the most relevant chunk of text from the PDF: {chunks[best_idx]}. Use the chunk of text to answer the user's question as best as you can. If you don't know the answer, say you don't know."
-    #     )
-
-    #     print("AI RESPONSE:", response.text)
-    #     print('chunk used: ', chunks[best_idx])
-    # except Exception as e:
-    #     print("Error generating response from Gemini:", e)
 
 class ProcessPDFRequest(BaseModel):
     urls: List[str]
     conversationID: str
     userID: str
-    file_names: List[str]
+    fileNames: List[str]
+
+class UserQueryRequest(BaseModel):
+    user_id: str
+    query: str
 
 @app.post('/process-pdfs')
 def process_pdfs(payload: ProcessPDFRequest):
     PDFs = payload.urls
     curr_pdf_num = 1
-    print(PDFs, payload.file_names)
     print('Processing...')
     for index, url in enumerate(PDFs):
         if requests.get(url).status_code == 200:
-            process_pdf_content(url, payload.conversationID, payload.userID, curr_pdf_num, payload.file_names[index])
+            process_pdf_content(url, payload.conversationID, payload.userID, curr_pdf_num, payload.fileNames[index])
             curr_pdf_num += 1
         else:
             print(f"Failed to access PDF at URL: {url}")
     return {"message": "PDF URLs processed successfully."}
 
-# @app.post('/user-query')
-# def user_query(query:str):
-#     # This is where the RAG pipeline would be executed in a real implementation
-#     # For demonstration, we'll just return the query and a placeholder response
-#     return {
-#         "query": query,
-#         "response": "This is where the AI-generated response would go based on the retrieved information from the PDFs."
-#     }
+def is_likely_question(query:str) -> bool:
+    # add valid python regex to check if the query contains common question words or ends with a question mark
+
+    return re.search(r"(\bwhat\b|\bwhy\b|\blist\b|\bexplain\b|\bhow\b|\bwhen\b|\bwhere\b|\bexplain\b|\btell me\b|\bcan you\b|\?)", query, re.IGNORECASE) is not None
+
+@app.post('/user-query/{conversation_id}')
+def user_query(conversation_id: str, payload: UserQueryRequest):
+    user_query_text = payload.query
+
+    if not is_likely_question(user_query_text):
+        return {
+            "answer": "Hello! I'm Docent, your AI assistant. Ask a question about your uploaded documents and I'll help you find relevant information."
+        }
+
+    chunks = find_similar(payload.user_id, conversation_id, user_query_text)
+
+    res_text_chunk = ""
+    res_file_name = ""
+    chunk_reference: list[dict] = []
+
+    GEMINI_PROMPT = ""
+
+    if chunks and getattr(chunks, "matches", None):
+        # take top match
+        top_match = chunks.matches[0]
+        metadata = getattr(top_match, "metadata", {})
+
+        res_text_chunk = metadata.get("chunk_text", "")
+        res_file_name = metadata.get("file_name", "")
+
+        chunk_reference.append({
+            "id": f"{res_file_name}_{metadata.get('chunk_idx', 0)}",
+            "text": res_text_chunk
+        })
+
+        GEMINI_PROMPT = f"""
+            You are Docent, an AI assistant that answers strictly based on the user's uploaded documents.
+
+            User question:
+            {user_query_text}
+
+            Retrieved document chunk:
+            {res_text_chunk}
+
+            Rules:
+            1. Answer ONLY using the provided chunk.
+            2. You may use simple logical reasoning to infer answers that are clearly and directly implied by the text.
+            3. Do NOT require exact wording matches. Semantic equivalence and obvious implications are allowed.
+            4. If the answer cannot be found OR reasonably inferred from the chunk, say: "I don't know based on the provided documents."
+            5. Do NOT use outside knowledge.
+            6. Do NOT acknowledge you're using chunks to answer. Just answer the question directly.
+            7. If the chunk does not contain relevant info, say you couldn't find relevant information.
+            8. If multiple interpretations are possible, explain the ambiguity instead of guessing.
+            9. If multiple chunks conflict, mention the conflict instead of choosing one.
+
+            Formatting Rules:
+            10. Return the answer in valid HTML format ONLY.
+            11. Do NOT use markdown.
+            12. Do NOT include <html>, <head>, or <body> tags.
+            13. Use appropriate HTML elements such as <p>, <ul>, <ol>, <li>, and <strong> for structure.
+            14. You MAY use headers like <h3> or <h4> if helpful.
+            15. Ensure the output is clean, properly closed, and renderable.
+            
+            Answer clearly and concisely.
+            """
+    
+    else:
+        res_text_chunk = "No matches found"
+        res_file_name = "No matches found"
+
+        GEMINI_PROMPT = f"""
+        You are Docent, an AI assistant that answers strictly based on the user's uploaded documents.
+
+        User question:
+        {user_query_text}
+
+        Retrieved document chunk:
+        {res_text_chunk}
+
+        Rules:
+        1. If the chunk contains 'No matches found', say you couldn't find relevant information.
+        2. Answer ONLY using the provided chunk as your source of truth.
+        3. You may use simple, direct logical inference when the answer is clearly implied by the text.
+        4. Do NOT require exact wording matches; use semantic understanding of the content.
+        5. If the answer cannot be found or reasonably inferred from the chunk, say: "I don't know based on the provided documents."
+        6. Do NOT use outside knowledge or assumptions beyond what is supported by the text.
+        7. If the information is incomplete or ambiguous, explain what is missing instead of guessing.
+        8. If the user greets you, greet them briefly and redirect them to questions about the documents.
+        9. If the user asks what AI model you are, say you cannot disclose that information and redirect to document-related questions.
+
+        Formatting Rules:
+        10. Return the answer in valid HTML format ONLY.
+        11. Do NOT use markdown.
+        12. Do NOT include <html>, <head>, or <body> tags.
+        13. Use appropriate HTML elements such as <p>, <ul>, <ol>, <li>, and <strong> for structure.
+        14. You MAY use headers like <h3> or <h4> if helpful.
+        15. Ensure the output is clean, properly closed, and renderable.
+
+        Answer clearly and concisely.
+        """
+    try:
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=GEMINI_PROMPT
+        )
+
+        return {
+            "answer": response.text,
+            "source_file": res_file_name,
+            "chunk_reference": chunk_reference,
+            "error": None
+        }
+
+    except Exception as e:
+        print("Error generating response from Gemini:", e)
+        return {
+            "answer": "Sorry, I'm having trouble generating a response right now.",
+            "source_file": res_file_name,
+            "chunk_reference": chunk_reference,
+            "error": str(e)
+        }
 
 # To run this server, use the command: uvicorn server:app --reload
+
+# If you get a Pinecone unauthorized/malformed domain error, just restart your Python server
