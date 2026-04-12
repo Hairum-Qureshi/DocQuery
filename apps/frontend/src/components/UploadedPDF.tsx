@@ -13,7 +13,7 @@ export default function UploadedPDF({
 	removeFile
 }: {
 	documentName: string;
-	documentURL: string;
+	documentURL?: string;
 	indexToRemove?: number;
 	reducePadding?: boolean;
 	showRemove?: boolean;
@@ -73,7 +73,7 @@ export default function UploadedPDF({
 					<>
 						<button
 							type="button"
-							onClick={() => downloadDocument(documentURL)}
+							onClick={() => documentURL && downloadDocument(documentURL)}
 							className="hover:text-gray-700"
 							title="Download button"
 						>
