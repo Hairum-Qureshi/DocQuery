@@ -32,6 +32,8 @@ export default function useConversation(): UseConversationHook {
 		queryKey: ["conversation", convoID],
 		queryFn: async () => {
 			try {
+				if (!convoID) return undefined;
+
 				const response = await axios.get(
 					`${import.meta.env.VITE_BACKEND_URL}/conversation/${convoID}`,
 					{

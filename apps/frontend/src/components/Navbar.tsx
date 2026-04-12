@@ -4,7 +4,7 @@ export default function Navbar() {
 	return (
 		<div className="flex text-white items-center px-4 py-3 bg-blue-700">
 			<h1 className="text-2xl font-bold">DocQuery</h1>
-			<nav className="ml-10 space-x-4">
+			<nav className="ml-10 space-x-6 w-full flex">
 				<Link to="/" className="hover:underline">
 					Home
 				</Link>
@@ -26,7 +26,7 @@ export default function Navbar() {
 				<Link to="/account" className="hover:underline">
 					Profile
 				</Link>
-				<Link to="/logout" className="hover:underline">
+				<Link to="/logout" className="hover:underline flex ml-auto">
 					Logout
 				</Link>
 			</nav>
