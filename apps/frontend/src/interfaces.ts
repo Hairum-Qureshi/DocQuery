@@ -18,4 +18,13 @@ interface Conversation {
 	updatedAt: string;
 }
 
-export type { UseGoogleAuthHook, Conversation };
+interface Message {
+	_id: string;
+	conversationID: string;
+	senderID: string;
+	content: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export type { UseGoogleAuthHook, Conversation, Message };
