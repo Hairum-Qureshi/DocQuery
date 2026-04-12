@@ -12,7 +12,7 @@ export class Conversation {
   @Prop({
     type: [
       {
-        file_name: String,
+        fileName: String,
         url: String,
       },
     ],
