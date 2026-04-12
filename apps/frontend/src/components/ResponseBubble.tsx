@@ -1,9 +1,15 @@
-export default function ResponseBubble() {
+export default function ResponseBubble({
+	message,
+	you
+}: {
+	message: string;
+	you: boolean;
+}) {
 	return (
-		<div className="bg-gray-200 p-2 rounded-md">
-			Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus
-			corrupti nihil enim velit officiis deleniti est at esse maiores? Dolores
-			minima, animi quam in sit labore ducimus deleniti architecto ab.
+		<div
+			className={`p-2 rounded-md ${you ? "bg-blue-400 text-white w-1/2 ml-auto" : "bg-gray-200 w-1/2 mr-auto"}`}
+		>
+			{message}
 		</div>
 	);
 }
