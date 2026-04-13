@@ -18,7 +18,10 @@ import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private configService: ConfigService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('google/sign-in')
   @UsePipes(new ValidationPipe())
