@@ -131,8 +131,7 @@ def process_pdfs(payload: ProcessPDFRequest):
 
 def is_likely_question(query:str) -> bool:
     # add valid python regex to check if the query contains common question words or ends with a question mark
-
-    return re.search(r"(\bwhat\b|\bwhy\b|\blist\b|\bexplain\b|\bhow\b|\bwhen\b|\bwhere\b|\bexplain\b|\btell me\b|\bcan you\b|\?)", query, re.IGNORECASE) is not None
+    return re.search(r"(\bwhat\b|\bwhy\b|\blist\b|\bexplain\b|\bhow\b|\bwhen\b|\bwhere\b|\bexplain\b|\btell me\b|\bcan you\b|\bgive me\b|\?)", query, re.IGNORECASE) is not None
 
 @app.post('/user-query/{conversation_id}')
 def user_query(conversation_id: str, payload: UserQueryRequest):
