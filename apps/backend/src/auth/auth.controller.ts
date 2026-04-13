@@ -14,10 +14,11 @@ import type { Response, CookieOptions } from 'express';
 import { BearerToken } from 'src/decorators/bearerToken.decorator';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import * as types from 'src/types';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private configService: ConfigService) {}
 
   @Post('google/sign-in')
   @UsePipes(new ValidationPipe())
@@ -29,9 +30,9 @@ export class AuthController {
 
     res.cookie('auth-session', jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: this.configService.get('NODE_ENV') === 'production' ? 'none' : 'lax',
+      maxAge: this.configService.get<number>('JWT_EXPIRES'),
     });
 
     return { jwtToken };
